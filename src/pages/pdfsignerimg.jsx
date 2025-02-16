@@ -56,32 +56,32 @@ export default function PdfWatermarkImg() {
       const signatureDims = signatureImage.scale(0.3);
       pages.forEach((page) => {
         const { width, height } = page.getSize();
-        
+
         // เพิ่ม combinedText ก่อนรูปภาพ
         page.drawText(`${combinedText}`, {
           x: width - 250,
-          y: height - 320,  // ปรับตำแหน่งให้ชิดขึ้น
+          y: height - 320, // ปรับตำแหน่งให้ชิดขึ้น
           size: 12,
           color: rgb(0, 0, 1),
         });
-    
+
         // เพิ่มรูปภาพลายเซ็น
         page.drawImage(signatureImage, {
           x: width - 250,
-          y: height - 380,  // ปรับตำแหน่งให้ชิดขึ้น
+          y: height - 340,  // ปรับตำแหน่งให้ชิดขึ้น
           width: signatureDims.width,
           height: signatureDims.height,
         });
-    
+
         // เพิ่มชื่อและวันที่หลังรูปภาพ
         page.drawText(`${userName}\n${currentDate}`, {
           x: width - 250,
-          y: height - 450,  // ปรับตำแหน่งให้ชิดขึ้น
+          y: height - 380,// ปรับตำแหน่งให้ชิดขึ้น
           size: 12,
           color: rgb(0, 0, 1),
         });
       });
-    }    
+    }
 
     const modifiedPdfBytes = await pdfDoc.save();
     setWatermarkedPdf(URL.createObjectURL(new Blob([modifiedPdfBytes], { type: "application/pdf" })));

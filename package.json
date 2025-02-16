@@ -18,7 +18,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-draggable": "^4.4.6",
-    "react-pdf": "^5.7.2"
+    "react-pdf": "^5.7.2",
+    "react-rnd": "^10.4.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
