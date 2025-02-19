@@ -1,18 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  webpack: (config) => {
-    // เพิ่มการใช้ file-loader สำหรับไฟล์ pdf.worker.js
-    config.module.rules.push({
-      test: /pdf\.worker\.(min\.)?js$/,
-      use: {
-        loader: "file-loader",
-        options: {
-          name: "[name].[hash].[ext]",  // เปลี่ยนชื่อไฟล์
-          outputPath: "static/pdf-workers/", // กำหนด path ที่จะเก็บไฟล์
-        },
-      },
-    });
+  webpack: (config, { isServer }) => {
+    // ปรับการตั้งค่าสำหรับ client-side
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false, // ปิดการใช้ fs ในฝั่ง client
+        path: false, // ปิดการใช้ path ในฝั่ง client
+      };
+    }
     return config;
   },
 };
