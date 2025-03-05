@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroui/react": "^2.7.2",
+    "fontkit": "^2.0.4",
     "framer-motion": "^12.4.4",
     "next": "15.1.7",
     "pdf-lib": "^1.17.1",
