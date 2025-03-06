@@ -1,13 +1,16 @@
-import { HeroUIProvider } from '@heroui/react'
-import Layout from '@/components/layout';
+import { SessionProvider } from "next-auth/react";
+import { HeroUIProvider } from "@heroui/react";
+import Layout from "@/components/layout";
 import "@/styles/globals.css";
 
-export default function App({ Component, pageProps }) {
+export default function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
-    <HeroUIProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </HeroUIProvider>
+    <SessionProvider session={session}>
+      <HeroUIProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </HeroUIProvider>
+    </SessionProvider>
   );
 }
