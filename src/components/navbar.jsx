@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { signIn, signOut, useSession } from 'next-auth/react';
 import {
     Navbar,
     NavbarBrand,
@@ -17,6 +18,7 @@ import {
 } from "@heroui/react";
 
 export default function NavbarComp() {
+    const { data: session } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const menuItems = [
@@ -49,38 +51,42 @@ export default function NavbarComp() {
             </NavbarContent>
 
             <NavbarContent as="div" justify="end">
-                <Dropdown placement="bottom-end">
-                    <DropdownTrigger>
-                        <Avatar
-                            isBordered
-                            as="button"
-                            className="transition-transform"
-                            color="secondary"
-                            name="Avatar"
-                            size="sm"
-                            src={"https://i.pravatar.cc/150?u=a042581f4e29026704d"}
-                        />
-                    </DropdownTrigger>
-                    <DropdownMenu aria-label="Profile Actions" variant="flat">
-                        <DropdownItem key="profile" className="h-14 gap-2" href="/auth/profile">
-                            <p className="font-semibold">Signed in as</p>
-                            <p className="font-semibold">Test</p>
-                        </DropdownItem>
-                        <DropdownItem key="payment">Payment</DropdownItem>
-                        <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-                        <DropdownItem key="logout" color="danger" onClick={() => signOut()}>
-                            Log Out
-                        </DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
-                <Button
-                    radius="full"
-                    className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
-                >
-                    <Link href="/personal/login" color="foreground">
-                        Please Login
-                    </Link>
-                </Button>
+                {session ? (
+                    <>
+                        <Dropdown placement="bottom-end">
+                            <DropdownTrigger>
+                                <Avatar
+                                    isBordered
+                                    as="button"
+                                    className="transition-transform"
+                                    color="secondary"
+                                    name="Avatar"
+                                    size="sm"
+                                    src={session.user.image || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
+                                />
+                            </DropdownTrigger>
+                            <DropdownMenu aria-label="Profile Actions" variant="flat">
+                                <DropdownItem key="profile" className="h-14 gap-2" href="/auth/profile">
+                                    <p className="font-semibold">Signed in as</p>
+                                    <p className="font-semibold">{session.user.email}</p>
+                                </DropdownItem>
+                                <DropdownItem key="payment">Payment</DropdownItem>
+                                <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+                                <DropdownItem key="logout" color="danger" onPress={() => signOut()}>
+                                    Log Out
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </>
+                ) : (
+                    <Button
+                        radius="full"
+                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+                        onPress={() => signIn('google')}
+                    >
+                        Sign In with Google
+                    </Button>
+                )}
             </NavbarContent>
 
             <NavbarMenu>

@@ -23,6 +23,7 @@ export default function PdfWatermarkImg() {
     const [watermarkContent, setWatermarkContent] = useState("Sample Watermark");
     const [signature, setSignature] = useState(null);
     const [userName] = useState("ณัฐพงษ์ ปันธิยะ");
+    const [role] = useState("นักศึกษา");
     const currentDate = new Date().toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
     const [position, setPosition] = useState({ x: 50, y: 50 });
     const [pdfSize, setPdfSize] = useState({ width: null, height: null });
@@ -96,7 +97,7 @@ export default function PdfWatermarkImg() {
                         width: signatureDims.width,
                         height: signatureDims.height,
                     });
-                    page.drawText(`${userName}\n${currentDate}`, {
+                    page.drawText(`${userName}\n${role}\n${currentDate}`, {
                         x: position.x,
                         y: height - position.y - 20 - signatureDims.height - 20,
                         size: textSize,
@@ -114,8 +115,8 @@ export default function PdfWatermarkImg() {
     return (
         <div>
             <Head>
-                <title>Zismail Shop</title>
-                <meta name="description" content="Zismail Shop: Minecraft and FiveM server setups, website development, and bug fixing services." />
+                <title>Digital CMRU</title>
+                <meta name="description" content="ระบบลงนามเอกสารออนไลน์ สำนักดิจิทัล มหาวิทยาลัยราชภัฏเชียงใหม่ หน้าลงนาม" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
@@ -136,7 +137,7 @@ export default function PdfWatermarkImg() {
                                         <label className="text-blue-700 p-1">{watermarkTitle}</label>
                                         <div className="text-blue-700 p-1">{watermarkContent}</div>
                                         {signature && <img src={signature} alt="Signature" className="w-full h-auto" />}
-                                        <div className="mt-2 text-sm text-blue-700">{userName}<br />{currentDate}</div>
+                                        <div className="mt-2 text-sm text-blue-700">{userName}<br />{role}<br />{currentDate}</div>
                                     </div>
                                 </Rnd>
                             </>

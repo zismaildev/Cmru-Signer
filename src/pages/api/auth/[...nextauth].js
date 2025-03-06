@@ -47,5 +47,11 @@ export default NextAuth({
   },
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error",
+  },
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
   },
 });
