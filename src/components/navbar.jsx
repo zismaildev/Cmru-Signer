@@ -23,7 +23,7 @@ export default function NavbarComp() {
 
     const menuItems = [
         { label: "ลงนามออนไลน์", url: "/contents/pdfsigner" },
-        { label: "Docs", url: "/contents/docs" },
+        { label: "ข้อมูลส่วนตัว", url: "/auth/profile" },
     ];
 
     return (

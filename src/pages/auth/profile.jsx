@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { Avatar } from '@heroui/react';
 import Head from 'next/head';
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+    Form,
+    Input,
+} from "@heroui/react";
 
 export default function Profile() {
     const { data: session } = useSession();
@@ -10,6 +22,8 @@ export default function Profile() {
     const [lastName, setLastName] = useState('');
     const [role, setRole] = useState('');
     const [signature, setSignature] = useState(null);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [submitted, setSubmitted] = useState(null);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -70,51 +84,103 @@ export default function Profile() {
             </Head>
             <div className="max-w-7xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
                 <h2 className="text-3xl font-bold text-center text-gray-900">Profile</h2>
-                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                {session ? (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">First Name</label>
-                        <input
-                            type="text"
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                        />
+                        <div className="mt-8 p-4 text-center">
+                            <div className="mt-5 grid grid-cols-1 gap-4 p-5 sm:grid-cols-1 md:grid-cols-2">
+                                <div>
+                                    <Avatar
+                                        as="button"
+                                        className="w-50 h-50 text-large transition-transform"
+                                        isBordered
+                                        name={session.user.name}
+                                        src={session.user.image}
+                                    />
+                                </div>
+                                <div className="mt-3 md:text-right">
+                                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-gray-800">
+                                        สวัสดีคุณ
+                                    </h2>
+                                    <h4 className="mb-8 text-xl tracking-tight text-gray-600">
+                                        {session.user.name}
+                                    </h4>
+                                </div>
+                            </div>
+                            <h2 className="sm:text-1xl text-left text-2xl font-bold tracking-tight text-gray-800">
+                                อีเมล
+                            </h2>
+                            <h4 className="mb-8 text-left text-xl tracking-tight text-gray-600">
+                                {session.user.email}
+                            </h4>
+                            <h2 className="sm:text-1xl text-left text-2xl font-bold tracking-tight text-gray-800">
+                                ตำแหน่ง
+                            </h2>
+                            <h4 className="mb-8 text-left text-xl tracking-tight text-gray-600">
+                                {role}
+                            </h4>
+                        </div>
+                        <Button onPress={onOpen}>แก้ไขข้อมูล</Button>
+                        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                            <ModalContent>
+                                {(onClose) => (
+                                    <div className='text-gray-800'>
+                                        <ModalHeader className="flex flex-col gap-1">แก้ไขข้อมูลส่วนตัว</ModalHeader>
+                                        <ModalBody>
+                                            <Form className="w-full max-w-xs" onSubmit={handleSubmit}>
+                                                <Input
+                                                    label="First Name"
+                                                    labelPlacement="outside"
+                                                    name="firstName"
+                                                    value={firstName}
+                                                    onChange={(e) => setFirstName(e.target.value)}
+                                                    type="text"
+                                                />
+                                                <Input
+                                                    label="Last Name"
+                                                    labelPlacement="outside"
+                                                    name="lastName"
+                                                    value={lastName}
+                                                    onChange={(e) => setLastName(e.target.value)}
+                                                    type="text"
+                                                />
+                                                <Input
+                                                    label="Role"
+                                                    labelPlacement="outside"
+                                                    name="role"
+                                                    value={role}
+                                                    onChange={(e) => setRole(e.target.value)}
+                                                    type="text"
+                                                />
+                                                <Input
+                                                    label="Signature"
+                                                    labelPlacement="outside"
+                                                    name="signature"
+                                                    type="file"
+                                                    onChange={handleSignatureUpload}
+                                                />
+                                                <Button type="submit" variant="bordered">
+                                                    ยืนยัน
+                                                </Button>
+                                                {submitted && (
+                                                    <div className="text-small text-default-500">
+                                                        You submitted: <code>{JSON.stringify(submitted)}</code>
+                                                    </div>
+                                                )}
+                                            </Form>
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button color="danger" variant="light" onPress={onClose}>
+                                                ยกเลิก
+                                            </Button>
+                                        </ModalFooter>
+                                    </div>
+                                )}
+                            </ModalContent>
+                        </Modal>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Last Name</label>
-                        <input
-                            type="text"
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Role</label>
-                        <input
-                            type="text"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Signature</label>
-                        <input
-                            type="file"
-                            accept="image/png, image/jpeg"
-                            onChange={handleSignatureUpload}
-                            className="mt-1 block w-full"
-                        />
-                        {signature && <img src={signature} alt="Signature" className="mt-2 w-32 h-auto" />}
-                    </div>
-                    <button
-                        type="submit"
-                        className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
-                    >
-                        Save Profile
-                    </button>
-                </form>
+                ) : (
+                    <p>Loading...</p>
+                )}
             </div>
         </div>
     );
