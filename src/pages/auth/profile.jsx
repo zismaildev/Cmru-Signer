@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -10,6 +10,23 @@ export default function Profile() {
     const [lastName, setLastName] = useState('');
     const [role, setRole] = useState('');
     const [signature, setSignature] = useState(null);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const response = await fetch(`/api/profile?email=${session.user.email}`);
+            if (response.ok) {
+                const data = await response.json();
+                setFirstName(data.firstName || '');
+                setLastName(data.lastName || '');
+                setRole(data.role || '');
+                setSignature(data.signature || null);
+            }
+        };
+
+        if (session) {
+            fetchProfile();
+        }
+    }, [session]);
 
     const handleSignatureUpload = (event) => {
         const file = event.target.files[0];
@@ -37,7 +54,7 @@ export default function Profile() {
         });
 
         if (response.ok) {
-            router.push('/profile');
+            router.push('/auth/profile'); // Updated path
         } else {
             console.error('Failed to update profile');
         }
