@@ -102,7 +102,7 @@ export default function Profile() {
                                         สวัสดีคุณ
                                     </h2>
                                     <h4 className="mb-8 text-xl tracking-tight text-gray-600">
-                                        {session.user.name}
+                                        {firstName} {lastName}
                                     </h4>
                                 </div>
                             </div>

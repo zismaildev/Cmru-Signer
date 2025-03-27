@@ -7,6 +7,7 @@ import { pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
 import dynamic from "next/dynamic";
 import fontkit from "@pdf-lib/fontkit";
+import { useSession } from "next-auth/react";
 
 const Document = dynamic(() => import("react-pdf").then((mod) => mod.Document), { ssr: false });
 const Page = dynamic(() => import("react-pdf").then((mod) => mod.Page), { ssr: false });
@@ -17,13 +18,14 @@ export const title = [
 ];
 
 export default function PdfWatermarkImg() {
+    const { data: session } = useSession();
     const [pdfFile, setPdfFile] = useState(null);
     const [watermarkedPdf, setWatermarkedPdf] = useState(null);
     const [numPages, setNumPages] = useState(null);
     const [watermarkContent, setWatermarkContent] = useState("Sample Watermark");
     const [signature, setSignature] = useState(null);
-    const [userName] = useState("ณัฐพงษ์ ปันธิยะ");
-    const [role] = useState("นักศึกษา");
+    const [userName, setUserName] = useState("");
+    const [role, setRole] = useState("");
     const currentDate = new Date().toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
     const [position, setPosition] = useState({ x: 50, y: 50 });
     const [pdfSize, setPdfSize] = useState({ width: null, height: null });
@@ -32,7 +34,13 @@ export default function PdfWatermarkImg() {
 
     useEffect(() => {
         pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
-    }, []);
+
+        // Set user data from session
+        if (session) {
+            setUserName(`${session.user.firstName} ${session.user.lastname}`);
+            setRole(session.user.role);
+        }
+    }, [session]);
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
