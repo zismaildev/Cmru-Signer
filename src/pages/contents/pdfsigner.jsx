@@ -35,10 +35,10 @@ export default function PdfWatermarkImg() {
     useEffect(() => {
         pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
-        // Set user data from session
         if (session) {
-            setUserName(`${session.user.firstName} ${session.user.lastname}`);
+            setUserName(`${session.user.firstname} ${session.user.lastname}`);
             setRole(session.user.role);
+            setSignature(session.user.signature);
         }
     }, [session]);
 
@@ -80,39 +80,41 @@ export default function PdfWatermarkImg() {
 
             pages.forEach((page) => {
                 const textSize = 14;
-                const titleWidth = thaiFont.widthOfTextAtSize(watermarkTitle, textSize);
-                const contentWidth = thaiFont.widthOfTextAtSize(watermarkContent, textSize);
 
-                if (!isNaN(position.y) && !isNaN(height)) {
-                    page.drawText(watermarkTitle, {
-                        x: position.x,
-                        y: height - position.y,
-                        size: 16,
-                        font: thaiFont,
-                        color: rgb(0, 0, 1),
-                        fontWeight: 'bold',
-                    });
-                    page.drawText(watermarkContent, {
-                        x: position.x,
-                        y: height - position.y - 20,
-                        size: textSize,
-                        font: thaiFont,
-                        color: rgb(0, 0, 1),
-                    });
-                    page.drawImage(signatureImage, {
-                        x: position.x,
-                        y: height - position.y - 45,
-                        width: signatureDims.width,
-                        height: signatureDims.height,
-                    });
-                    page.drawText(`${userName}\n${role}\n${currentDate}`, {
-                        x: position.x,
-                        y: height - position.y - 20 - signatureDims.height - 20,
-                        size: textSize,
-                        font: thaiFont,
-                        color: rgb(0, 0, 1),
-                    });
-                }
+                // Use Rnd position and size for stamping
+                const stampX = position.x;
+                const stampY = height - position.y;
+                const stampWidth = 200; // Rnd width
+                const stampHeight = 150; // Rnd height
+
+                page.drawText(watermarkTitle, {
+                    x: stampX,
+                    y: stampY,
+                    size: 16,
+                    font: thaiFont,
+                    color: rgb(0, 0, 1),
+                    fontWeight: 'bold',
+                });
+                page.drawText(watermarkContent, {
+                    x: stampX,
+                    y: stampY - 20,
+                    size: textSize,
+                    font: thaiFont,
+                    color: rgb(0, 0, 1),
+                });
+                page.drawImage(signatureImage, {
+                    x: stampX,
+                    y: stampY - 45,
+                    width: signatureDims.width,
+                    height: signatureDims.height,
+                });
+                page.drawText(`${userName}\n${role}\n${currentDate}`, {
+                    x: stampX,
+                    y: stampY - 20 - signatureDims.height - 20,
+                    size: textSize,
+                    font: thaiFont,
+                    color: rgb(0, 0, 1),
+                });
             });
         }
 
@@ -145,7 +147,11 @@ export default function PdfWatermarkImg() {
                                         <label className="text-blue-700 p-1">{watermarkTitle}</label>
                                         <div className="text-blue-700 p-1">{watermarkContent}</div>
                                         {signature && <img src={signature} alt="Signature" className="w-full h-auto" />}
-                                        <div className="mt-2 text-sm text-blue-700">{userName}<br />{role}<br />{currentDate}</div>
+                                        <div className="mt-2 text-sm text-blue-700">
+                                            {userName}<br />
+                                            {role}<br />
+                                            {currentDate}
+                                        </div>
                                     </div>
                                 </Rnd>
                             </>

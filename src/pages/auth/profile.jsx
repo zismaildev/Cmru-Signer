@@ -25,23 +25,6 @@ export default function Profile() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [submitted, setSubmitted] = useState(null);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            const response = await fetch(`/api/profile?email=${session.user.email}`);
-            if (response.ok) {
-                const data = await response.json();
-                setFirstName(data.firstName || '');
-                setLastName(data.lastName || '');
-                setRole(data.role || '');
-                setSignature(data.signature || null);
-            }
-        };
-
-        if (session) {
-            fetchProfile();
-        }
-    }, [session]);
-
     const handleSignatureUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -51,26 +34,48 @@ export default function Profile() {
         }
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const response = await fetch('/api/profile', {
-            method: 'POST',
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!session) {
+            alert("Session not found. Please log in again.");
+            return;
+        }
+
+        console.log("Session:", session);
+        console.log("Form Data:", { firstName, lastName, role, signature, email: session.user.email });
+
+        const response = await fetch("/api/updateProfile", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${session.accessToken}`,
             },
             body: JSON.stringify({
-                email: session.user.email,
                 firstName,
                 lastName,
                 role,
                 signature,
+                email: session.user.email,
             }),
         });
 
         if (response.ok) {
-            router.push('/auth/profile'); // Updated path
+            const responseData = await response.json();
+            console.log("Updated Data:", responseData.data); // Debugging: Log the updated data
+
+            // Update the state with the returned data
+            setFirstName(responseData.data.firstname);
+            setLastName(responseData.data.lastname);
+            setRole(responseData.data.role);
+            setSignature(responseData.data.signature);
+
+            setSubmitted(true);
+            alert("Profile updated successfully");
         } else {
-            console.error('Failed to update profile');
+            const errorData = await response.json();
+            console.error("Error:", errorData);
+            alert("Failed to update profile");
         }
     };
 
@@ -90,7 +95,6 @@ export default function Profile() {
                             <div className="mt-5 grid grid-cols-1 gap-4 p-5 sm:grid-cols-1 md:grid-cols-2">
                                 <div>
                                     <Avatar
-                                        as="button"
                                         className="w-50 h-50 text-large transition-transform"
                                         isBordered
                                         name={session.user.name}
@@ -102,10 +106,16 @@ export default function Profile() {
                                         สวัสดีคุณ
                                     </h2>
                                     <h4 className="mb-8 text-xl tracking-tight text-gray-600">
-                                        {firstName} {lastName}
+                                        {session.user.name}
                                     </h4>
                                 </div>
                             </div>
+                            <h2 className="sm:text-1xl text-left text-2xl font-bold tracking-tight text-gray-800">
+                                ชื่อ - นามสกุล
+                            </h2>
+                            <h4 className="mb-8 text-left text-xl tracking-tight text-gray-600">
+                                {session.user.firstname} {session.user.lastname}
+                            </h4>
                             <h2 className="sm:text-1xl text-left text-2xl font-bold tracking-tight text-gray-800">
                                 อีเมล
                             </h2>
@@ -116,7 +126,7 @@ export default function Profile() {
                                 ตำแหน่ง
                             </h2>
                             <h4 className="mb-8 text-left text-xl tracking-tight text-gray-600">
-                                {role}
+                                {session.user.role}
                             </h4>
                         </div>
                         <Button onPress={onOpen}>แก้ไขข้อมูล</Button>
